@@ -1,0 +1,10 @@
+openmdao>=3.11
+numpy
+pandas
+openpyxl
+scipy
+jax
+jaxlib
+matplotlib
+notebook
+ipython

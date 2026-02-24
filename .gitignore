@@ -1,0 +1,20 @@
+/.venv
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+run_openmdao_opt_gwp_out/
+run_openmdao_opt_toc_out/
+jax_cache/
+/.pytest_cache
+.vscode/
+dist/
+build/
+*.egg-info/
+# Ignore results and artifacts, but keep .gitkeep files
+/src/results/*
+!/src/results/GWP/.gitkeep
+!/src/results/TOC/.gitkeep
+*.xlsx
+*.html
