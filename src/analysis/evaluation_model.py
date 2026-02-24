@@ -363,10 +363,70 @@ def full_model_evaluation(b, c, R_prop_cruise, R_prop_hover, rho_bat, c_charge, 
     return results, comparison_table
 
 
-
-
-
 def write_results_to_excel(results_dict, comparison_list, mode="tests", filename=None):
+    """
+    Writes model results (dict) and transportation mode comparison (list of dicts)
+    to one Excel file in 'src/results/<mode>/' with timestamp-based name.
+    """
+    import os
+    from datetime import datetime
+    import pandas as pd
+
+    # 1. Zielverzeichnis prüfen
+    assert mode in ["tests", "GA", "GBO", "FoM", "GWP", "Profit", "TOC"], "Invalid mode."
+    results_base = os.path.join("src", "results", mode)
+    os.makedirs(results_base, exist_ok=True)
+
+    # 2. Timestamp and path
+    if filename is None:
+        timestamp = datetime.now().strftime("%d%m%y_%H%M")
+        filename = f"{timestamp}_results.xlsx"
+    else:
+        if not filename.lower().endswith('.xlsx'):
+            filename = f"{filename}.xlsx"
+
+    output_path = os.path.join(results_base, filename)
+
+    try:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+    except Exception:
+        pass
+
+    # 3. Model Results vorbereiten
+    rows = []
+    for section, metrics in results_dict.items():
+        rows.append((section, "", "", ""))  
+        for label, (value, unit) in metrics.items():
+            rows.append(("", label, value, unit))
+    df_results = pd.DataFrame(rows, columns=["Section", "Metric", "Value", "Unit"])
+
+    # 4. Comparison Table (FIXED LOGIC)
+    df_comparison = pd.DataFrame(comparison_list)
+    # Only sort if the dataframe is not empty and the column exists
+    if not df_comparison.empty and "FoM" in df_comparison.columns:
+        df_comparison = df_comparison.sort_values(by="FoM", ascending=False)
+
+    # 5. Excel schreiben
+    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+        df_results.to_excel(writer, sheet_name="Model Results", index=False)
+        # Even if empty, we write the sheet so the Excel structure is consistent
+        df_comparison.to_excel(writer, sheet_name="Comparison Modes", index=False)
+
+    print(f"Results written to: {output_path}")
+    return output_path, df_results
+
+
+
+
+
+
+
+
+
+
+
+#def write_results_to_excel(results_dict, comparison_list, mode="tests", filename=None):
     """
     Writes model results (dict) and transportation mode comparison (list of dicts)
     to one Excel file in 'src/results/<mode>/' with timestamp-based name.
@@ -421,3 +481,40 @@ def write_results_to_excel(results_dict, comparison_list, mode="tests", filename
     print(f"Results written to: {output_path}")
     return df_results, df_comparison
 
+
+
+
+
+
+
+
+
+
+
+def display_model_dashboard(results_dict):
+    """
+    Groups and displays all model results as a formatted table in Jupyter/Binder.
+    """
+    import pandas as pd
+    from IPython.display import display
+
+    # --- ADD THESE LINES HERE ---
+    pd.set_option('display.max_rows', 150)      # Show all rows
+    pd.set_option('display.max_columns', 150)   # Show all columns
+    # ----------------------------
+
+    flat_data = []
+    for section, metrics in results_dict.items():
+        for label, (value, unit) in metrics.items():
+            flat_data.append({
+                "Section": section,
+                "Metric": label,
+                "Value": value,
+                "Unit": unit
+            })
+    
+    df = pd.DataFrame(flat_data)
+    # Set multi-index for "Prettier" grouping by Section
+    styled_df = df.set_index(['Section', 'Metric'])
+    
+    display(styled_df)
