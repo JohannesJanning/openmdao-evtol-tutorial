@@ -1,20 +1,33 @@
-/.venv
+# Environments and cache
+.venv/
 venv/
 __pycache__/
 *.pyc
+jax_cache/
+.pytest_cache/
+.vscode/
+
+# System files
 .DS_Store
 .ipynb_checkpoints/
-run_openmdao_opt_gwp_out/
-run_openmdao_opt_toc_out/
-jax_cache/
-/.pytest_cache
-.vscode/
+
+# OpenMDAO temporary output folders (Surgical Cleanup)
+*_out/
+problem*/
+coloring_files/
+*.pkl
+*.sql
+
+# Build and distribution
 dist/
 build/
 *.egg-info/
-# Ignore results and artifacts, but keep .gitkeep files
-/src/results/*
+
+# Results and artifacts
+/src/results/**/*
 !/src/results/GWP/.gitkeep
 !/src/results/TOC/.gitkeep
+
+# Ignore generated reports
 *.xlsx
 *.html
