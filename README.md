@@ -1,6 +1,8 @@
 # eVTOL Multidisciplinary Design Optimization (MDO) Tutorial
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/JohannesJanning/openmdao-evtol-tutorial/main?urlpath=lab/tree/README.md)
+<a href="https://mybinder.org/v2/gh/JohannesJanning/openmdao-evtol-tutorial/main?urlpath=lab/tree/README.md" target="_blank">
+  <img src="https://mybinder.org/badge_logo.svg" alt="Binder">
+</a>
 
 This repository provides an interactive tutorial for the conceptual design and optimization of Electric Vertical Take-off and Landing (eVTOL) aircraft. It allows students and researchers to explore the trade-offs between environmental sustainability and economic viability in future urban air mobility.
 
