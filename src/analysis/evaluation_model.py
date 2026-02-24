@@ -378,8 +378,8 @@ def write_results_to_excel(results_dict, comparison_list, mode="tests", filename
     # 1. Zielverzeichnis prüfen
     assert mode in ["tests", "GA", "GBO", "FoM", "GWP", "Profit", "TOC"], "Invalid mode."
     results_base = os.path.join("src", "results", mode)
-    if not os.path.exists(results_base):
-        raise FileNotFoundError(f"The folder '{results_base}' does not exist.")
+    # Ensure the results directory exists (create if missing) to support Binder
+    os.makedirs(results_base, exist_ok=True)
 
     # 2. Timestamp and path
     if filename is None:
