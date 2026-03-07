@@ -112,12 +112,12 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 ## 1.2 Environmental Optimization
 
-7. Ensure the notebook is in its initial state.
-8. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
-9. Run the optimization.
-10. Cell 5: Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector**.
-11. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
-12. Run the optimization and compare results in the Dashboard.
+1. Ensure the notebook is in its initial state.
+2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
+3. Run the optimization.
+4. Cell 5: Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector**.
+5. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
+6. Run the optimization and compare results in the Dashboard.
 
 *Notice how optimizing for a single flight vs. a whole year shifts the design.*
 
