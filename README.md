@@ -2,7 +2,7 @@
 
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org)
 
-This repository provides an interactive tutorial for the conceptual design and optimization of an lift+cruise Electric Vertical Take-off and Landing (eVTOL) aircraft. It allows to explore the trade-offs between environmental sustainability and economic viability in future urban air mobility.
+This repository provides an interactive tutorial for the conceptual design and optimization of a lift+cruise Electric Vertical Take-off and Landing (eVTOL) aircraft. It enables you to easily explore the conceptual trade-offs between environmental sustainability and economic viability in future urban air mobility.
 
 ---
 
@@ -18,7 +18,7 @@ The framework integrates conventional aircraft design elements with operational 
 <img src="repo_images/XDSM_evtol_model.png" width="800">
 </p>
 
-**Caption:** eXtended Design Structure Matrix of the provided design optimization problem. Figure includes single objectives of min. annual GWP (kg CO2e) and min. total operating cost (TOC) (€) per flight as example, that can be adjusted (see tutorial in Section 5).
+**Figure 1:** [eXtended Design Structure Matrix](https://openmdao.github.io/PracticalMDO/Notebooks/ModelConstruction/understanding_xdsm_diagrams.html) of the provided design optimization problem. Figure includes single objectives of min. annual GWP (kg CO2e) and min. total operating cost (TOC) (€) per flight as example, that can be adjusted (see tutorial in Section 5).
 
 ---
 
@@ -26,11 +26,9 @@ The framework integrates conventional aircraft design elements with operational 
 
 The project utilizes the following computational stack:
 
-- **[OpenMDAO](https://github.com/OpenMDAO/OpenMDAO)**  
-  An open-source framework for multidisciplinary analysis and optimization. It manages the coupling between multiple analysis blocks, like aerodynamics, mass estimation, energy requirements, and cost models.
+- **[OpenMDAO](https://github.com/OpenMDAO/OpenMDAO)**: An open-source framework for multidisciplinary analysis and optimization. It manages the coupling between multiple analysis blocks, like aerodynamics, mass estimation, energy requirements, and cost models.
 
-- **[JAX](https://github.com/jax-ml/jax)**  
-  A library for composable transformations of Python and NumPy programs. It enables efficient gradient-based optimization through automatic differentiation.
+- **[JAX](https://github.com/jax-ml/jax)**: A library for composable transformations of Python and NumPy programs. It enables efficient gradient-based optimization through automatic differentiation.
 
 ---
 
@@ -42,26 +40,16 @@ Click the Binder badge at the top of this page to launch a cloud-resident Jupyte
 
 ## Optimization Workflows
 
-The tutorial consists of one primary notebook:
-
-**01_optimize_GWP.ipynb**
-
-The notebook **02_optimize_TOC.ipynb** is identical and can be used as secondary comparison notebook.
-
-To execute a study, open a notebook and select:
-
-```
-Cell > Run All
-```
-
-from the top menu.
+The tutorial consists of one primary notebook: **01_optimize_GWP.ipynb**
+The notebook **02_optimize_TOC.ipynb** is identical and can be used as a secondary comparison notebook.
+To execute a study, open a notebook and select: "Run > Run All Cells" from the top menu.
 
 ---
 
 # 4. Repository Structure
 
 - **01_optimize_GWP.ipynb & 02_optimize_TOC.ipynb**  
-  Primary interactive tutorial notebooks (but as the objective function is adjustable, we can use either one for the Tutorial in section 5).
+  Primary interactive tutorial notebooks (as the objective function is adjustable, either notebook can be used for the tasks in Section 5).
 
 - **src/**  
   The core source code directory.
@@ -73,7 +61,7 @@ from the top menu.
     Post-optimization processing and evaluation scripts.
 
   - **Components/**  
-    components deifning the OpenMDAO model.
+    components defining the OpenMDAO model.
 
   - **parameters.py**  
     Central configuration for aircraft constants and mission assumptions.
@@ -107,47 +95,47 @@ You may find helpful:
 
 # Task 1: Design Trade-offs
 
-Goal: Understand how the definition of an objective function dictates the physical architecture.
+Goal: Understand how the selection of an objective function dictates the physical architecture.
 
 ## 1.1 Comparing Objectives
 
 1. Ensure the notebook is in its initial state.
-2. Cell 2.3: Set objective to minimize **GWP_flight** (ref: 20).
+2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
 3. Run the optimization.
 4. Cell 5: Copy the resulting **Optimal Design Vector** from Cell 4 into the **baseline_vector** variable.
-5. Cell 2.3: Change objective to minimize **TOC_flight** (ref: 100).
+5. Cell 2.3: Change objective to minimize **TOC_flight** (set ref: 100).
 6. Run the optimization and compare results in the Dashboard.
 
-Notice: observe how this two design variables sets introduce tradeoffs in environmental impact and operational costs.
+*Observe how these two design variables sets introduce tradeoffs in environmental impact and operational costs.*
 
 ---
 
 ## 1.2 Environmental Optimization
 
 7. Ensure the notebook is in its initial state.
-8. Cell 2.3: Set objective to minimize **GWP_flight** (ref: w0).
+8. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
 9. Run the optimization.
-10. Cell 5: Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector** variable.
-11. Cell 2.3: Change objective to minimize **GWP_annual_ops** (ref: 50000).
+10. Cell 5: Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector**.
+11. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
 12. Run the optimization and compare results in the Dashboard.
 
-Observation: Notice how optimizing for a single flight vs. a whole year shifts the design.
+*Notice how optimizing for a single flight vs. a whole year shifts the design.*
 
 ---
 
 ## 1.3 Economic Optimization
 
 1. Reset to initial settings.
-2. Cell 2.3: Set objective to minimize **TOC_flight** (ref: 100).
+2. Cell 2.3: Set objective to minimize **TOC_flight** (set ref: 100).
 3. Run the optimization.
-4. Cell 5: Copy the Optimal Design Vector into **baseline_vector**.
+4. Cell 5: Copy the Optimal Design Vector into the **baseline_vector**.
 5. Cell 2.3: Set objective to maximize **Annual_Profit**.
 
 Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO's minimization-based solver).
 
 6. Run and compare.
 
-Observation: Identify the utilization trade-off. Does a more profitable plane fly differently than a cheaper-to-operate one?
+*Identify the utilization trade-off. Does a more profitable plane fly differently than a cheaper-to-operate one?*
 
 ---
 
@@ -155,20 +143,20 @@ Observation: Identify the utilization trade-off. Does a more profitable plane fl
 
 Goal: Observe how design variable limitations impact the design space.
 
-1. Run a baseline **TOC_flight** optimization.
+1. Run a baseline **TOC_flight** optimization (as described in task 1.1).
 2. Cell 5: Copy the vector into **baseline_vector**.
 3. Cell 2.1 (Design Variables): Change the upper bound of the battery energy density (**rho_bat**) from **400** to **300**.
 4. Run the optimization.
 
-Observation: How does our battery mass changes, how are our operating costs impacted?
+*Observation: How does our battery mass change, how are our operating costs impacted?*
 
 ---
 
 # Task 3: Hitting constraints
 
-Goal: Experience the mathematical struggle of highly-constrained design. (use 01_optimize_GWP.ipynb)
+Goal: Experience the mathematical struggle of highly-constrained design.
 
-1. Run a baseline **GWP_annual** optimization and save the result to **baseline_vector**.
+1. Run a baseline **GWP_annual** optimization and save the result to **baseline_vector** (as described in task 1.1).
 2. Cell 2.2 (Constraints): Change the maximum **MTOM constraint** from **5700 (EASA SC-VTOL limit)** to **1500**.
 3. Run the optimization.
 
@@ -186,8 +174,8 @@ Goal: Quantify the secondary benefits of pilotless flight systems.
 2. Cell 5: Copy the design vector into **baseline_vector**.
 3. parameters.py: Open the file in the sidebar and modify:
 
-m_crew: Change **96.5** to **20.0** (simulates sensor suite replacing a cockpit)  
-N_ac: Change **1** to **3** (simulates 1 ground-pilot supervising 3 aircraft)
+m_crew: Change **96.5** to **20.0** (simulates sensor suite replacing a cockpit).  
+N_ac: Change **1** to **3** (simulates 1 ground-pilot supervising 3 aircraft).
 
 4. Run the optimization.
 
@@ -204,7 +192,7 @@ If an optimization takes more than **60 seconds** or fails to converge, you may 
 
 # 6. Academic Citations
 
-If you utilize this framework or these models in your research, please cite the following:
+If you use this framework, these models, or methods in your research, please cite the following as applicable:
 
 ```bibtex
 @article{janning2025future,
@@ -231,3 +219,30 @@ If you utilize this framework or these models in your research, please cite the 
   year = {2018}
 }
 ```
+
+
+---
+
+# Further Reading & References
+
+If you want to dive deeper into the theory of **Multidisciplinary Design Optimization (MDO)** and **Urban Air Mobility (UAM)**, the following resources may be helpful:
+
+- **Martins, J. R. R. A., & Lambe, A. B. (2013)**  
+  *Multidisciplinary Design Optimization: A Survey of Architectures*  
+  A foundational paper explaining how complex engineering systems and MDO architectures (such as XDSM) are structured.  
+  https://arc.aiaa.org/doi/10.2514/1.J051895
+
+- **Martins, J. R. R. A., & Ning, A. (2021)**  
+  *Engineering Design Optimization*  
+  A comprehensive graduate-level textbook covering optimization algorithms, derivative computation, and multidisciplinary design optimization methods used in modern engineering.  
+  https://www.cambridge.org/core/product/identifier/9781108980647/type/book
+
+- **Sengupta, R., Bulusu, V., et al. (2025)**  
+  *Urban Air Mobility Research: Challenges and Opportunities*  
+  A modern review of operational, technological, and autonomy challenges shaping the future of the eVTOL and UAM ecosystem.  
+  https://www.annualreviews.org/content/journals/10.1146/annurev-control-022823-031353
+
+---
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
