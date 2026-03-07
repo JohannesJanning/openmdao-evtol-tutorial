@@ -10,9 +10,6 @@ from src.optimizer.components.geometry_comp import GeometryComp
 
 class eVTOLGroup(om.Group):
     """Group composing core components according to the XDSM diagram.
-
-    For the first iteration this wires `aero` -> `mtom`. We'll extend the
-    wiring iteratively to include Performance, Time, Energy, Mass, Environment.
     """
 
     def initialize(self):
