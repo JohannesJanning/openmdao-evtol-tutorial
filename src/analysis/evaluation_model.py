@@ -6,7 +6,8 @@ from datetime import datetime
 ####
 # LIBRARIES
 ####
-import src.parameters as p
+import src.parameters as p           # The "Target" or "Future" assumptions
+import src.baseline_parameters as pb  # The "Reference" or "Current" assumptions
 from src.models.aerodynamics import AR_calculation, drag_calculation, lift_calculation, ld_calculation, roc_calculation, cl_calculation, cd_calculation
 from src.models.battery import c_rate, c_rate_average, depth_of_discharge, battery_energy_capacity, number_of_battery_required_annually, battery_cycle_life
 from src.models.mass import interior_mass, gear_mass, fuselage_mass, battery_mass, motor_mass, wing_mass, rotor_mass, rotor_mass_per_unit, system_mass, empty_mass, compute_mtom_actual, mtom_iteration_loop, mass_fraction
@@ -211,10 +212,10 @@ def full_model_evaluation(b, c, R_prop_cruise, R_prop_hover, rho_bat, c_charge, 
     results = {
         "DESIGN VARIABLE": {
         "Wing span": (round(b, 3), "m"),
-        "Chrod length": (round(c, 3), "m"),
+        "Chord length": (round(c, 3), "m"),
         "Pusher rotor radius": (round(R_prop_cruise, 3), "m"),
         "Hover rotor radius": (round(R_prop_hover, 3), "m"),
-        "battery energy density": (round(rho_bat, 3), "Wh/kg"),
+        "Battery energy density": (round(rho_bat, 3), "Wh/kg"),
         "Charging C-rate": (round(c_charge, 3), "1/h"),
     },
 
@@ -363,7 +364,7 @@ def full_model_evaluation(b, c, R_prop_cruise, R_prop_hover, rho_bat, c_charge, 
     return results, comparison_table
 
 
-def write_results_to_excel(results_dict, comparison_list, mode="tests", filename=None):
+def write_results_to_excel(results_dict, comparison_list, mode="tests", filename=None, baseline=None):
     """
     Writes model results (dict) and transportation mode comparison (list of dicts)
     to one Excel file in 'src/results/<mode>/' with timestamp-based name.
@@ -393,13 +394,71 @@ def write_results_to_excel(results_dict, comparison_list, mode="tests", filename
     except Exception:
         pass
 
-    # 3. Model Results vorbereiten
+    
+    # baseline can be a list/tuple/ndarray or dict mapping metric label -> value
+    baseline_map = {}
+    if baseline is not None:
+        try:
+            import numpy as _np
+            # If baseline is a vector of design variables (expected length 6), compute full results
+            if isinstance(baseline, (list, tuple)) or (hasattr(_np, "ndarray") and isinstance(baseline, _np.ndarray)):
+                if len(baseline) == 6:
+                    try:
+                        baseline_results, _ = full_model_evaluation(
+                            baseline[0], baseline[1], baseline[2], baseline[3], baseline[4], baseline[5], p
+                        )
+                        # flatten baseline_results into label->value map
+                        for sec, metrics in baseline_results.items():
+                            for label, (val, unit) in metrics.items():
+                                baseline_map[label] = val
+                    except Exception:
+                        # fallback: map only design labels if evaluation fails
+                        design_labels = [
+                            "Wing span",
+                            "Chord length",
+                            "Pusher rotor radius",
+                            "Hover rotor radius",
+                            "Battery energy density",
+                            "Charging C-rate",
+                        ]
+                        baseline_map = {k: v for k, v in zip(design_labels, baseline)}
+                else:
+                    # non-standard-length vector: try to map to design labels partially
+                    design_labels = [
+                        "Wing span",
+                        "Chord length",
+                        "Pusher rotor radius",
+                        "Hover rotor radius",
+                        "Battery energy density",
+                        "Charging C-rate",
+                    ]
+                    baseline_map = {k: v for k, v in zip(design_labels, baseline)}
+            elif isinstance(baseline, dict):
+                # If user passed a full results dict (section->metrics), flatten it
+                if all(isinstance(v, dict) for v in baseline.values()):
+                    for sec, metrics in baseline.items():
+                        for label, (val, unit) in metrics.items():
+                            baseline_map[label] = val
+                else:
+                    # assume dict is label->value mapping
+                    baseline_map = baseline
+        except Exception:
+            baseline_map = {}
+
     rows = []
     for section, metrics in results_dict.items():
-        rows.append((section, "", "", ""))  
+        # section header row: keep Baseline empty
+        rows.append((section, "", "", "", ""))
         for label, (value, unit) in metrics.items():
-            rows.append(("", label, value, unit))
-    df_results = pd.DataFrame(rows, columns=["Section", "Metric", "Value", "Unit"])
+            bval = baseline_map.get(label, "")
+            # round baseline numeric values for readability
+            try:
+                if isinstance(bval, (int, float)):
+                    bval = round(bval, 3)
+            except Exception:
+                pass
+            rows.append(("", label, value, bval, unit))
+    df_results = pd.DataFrame(rows, columns=["Section", "Metric", "Value", "Baseline", "Unit"])
 
     # 4. Comparison Table (FIXED LOGIC)
     df_comparison = pd.DataFrame(comparison_list)
@@ -407,7 +466,7 @@ def write_results_to_excel(results_dict, comparison_list, mode="tests", filename
     if not df_comparison.empty and "FoM" in df_comparison.columns:
         df_comparison = df_comparison.sort_values(by="FoM", ascending=False)
 
-    # 5. Excel schreiben
+    # 5. Excel 
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         df_results.to_excel(writer, sheet_name="Model Results", index=False)
         # Even if empty, we write the sheet so the Excel structure is consistent
@@ -491,30 +550,126 @@ def write_results_to_excel(results_dict, comparison_list, mode="tests", filename
 
 
 
-def display_model_dashboard(results_dict):
+def display_model_dashboard(results_dict, baseline=None):
     """
     Groups and displays all model results as a formatted table in Jupyter/Binder.
     """
     import pandas as pd
     from IPython.display import display
 
-    # --- ADD THESE LINES HERE ---
-    pd.set_option('display.max_rows', 150)      # Show all rows
-    pd.set_option('display.max_columns', 150)   # Show all columns
-    # ----------------------------
+    # --- SET OPTIONS ---
+    pd.set_option('display.max_rows', 150)
+    pd.set_option('display.max_columns', 150)
+
+    # prepare optional baseline mapping
+    baseline_map = {}
+    if baseline is not None:
+        try:
+            import numpy as _np
+            if isinstance(baseline, (list, tuple)) or (hasattr(_np, "ndarray") and isinstance(baseline, _np.ndarray)):
+                if len(baseline) == 6:
+                    try:
+                        from src.analysis.evaluation_model import full_model_evaluation
+                        baseline_results, _ = full_model_evaluation(
+                            baseline[0], baseline[1], baseline[2], baseline[3], baseline[4], baseline[5], pb
+                        )
+                        for sec, metrics in baseline_results.items():
+                            for label, (val, unit) in metrics.items():
+                                baseline_map[label] = val
+                    except Exception:
+                        design_labels = ["Wing span", "Chord length", "Pusher rotor radius", "Hover rotor radius", "Battery energy density", "Charging C-rate"]
+                        baseline_map = {k: v for k, v in zip(design_labels, baseline)}
+            elif isinstance(baseline, dict):
+                baseline_map = baseline
+        except Exception:
+            baseline_map = {}
 
     flat_data = []
     for section, metrics in results_dict.items():
         for label, (value, unit) in metrics.items():
+            bval = baseline_map.get(label, "")
             flat_data.append({
                 "Section": section,
                 "Metric": label,
                 "Value": value,
+                "Baseline": bval,
                 "Unit": unit
             })
     
     df = pd.DataFrame(flat_data)
-    # Set multi-index for "Prettier" grouping by Section
+    
+    # 1. Set multi-index for grouping
     styled_df = df.set_index(['Section', 'Metric'])
     
-    display(styled_df)
+    # 2. Reorder columns
+    cols = ['Value', 'Baseline', 'Unit'] if 'Baseline' in df.columns else ['Value', 'Unit']
+    final_df = styled_df[cols]
+
+    # --- START OF STYLING LOGIC ---
+    plot_df = final_df.reset_index()
+    plot_df['Metric'] = plot_df['Metric'].replace('Chrod length', 'Chord length')
+    
+    # IMPORTANT: Convert Value and Baseline to numeric so the format '{:,.3f}' doesn't crash
+    plot_df['Value'] = pd.to_numeric(plot_df['Value'], errors='coerce')
+    plot_df['Baseline'] = pd.to_numeric(plot_df['Baseline'], errors='coerce')
+
+    # 2. Create the Styler
+    styler = plot_df.style.hide(axis="index")
+
+    # 3. ROUNDING & THOUSANDS SEPARATOR
+    format_dict = {'Value': '{:,.3f}', 'Baseline': '{:,.3f}'}
+    styler = styler.format(format_dict, na_rep="-")
+
+    # 4. HIDE REPEATED SECTION LABELS
+    def hide_repeats(column):
+        is_duplicate = column.duplicated()
+        return ['color: transparent' if v else '' for v in is_duplicate]
+    styler = styler.apply(hide_repeats, subset=['Section'], axis=0)
+
+    # 5. Uniform Light Blue for 'Value' column
+    styler = styler.set_properties(subset=['Value'], **{'background-color': '#e6f3ff'})
+    
+    # --- 5.5 NEW: HIGHLIGHT SPECIFIC ROWS ---
+    highlight_metrics = ["Ops GWP total per year", "Total operating cost per trip"]
+    def highlight_rows(row):
+        if row['Metric'] in highlight_metrics:
+            return ['background-color: #ffeb3b; font-weight: bold'] * len(row)
+        return [''] * len(row)
+    styler = styler.apply(highlight_rows, axis=1)
+
+    # 6. Global formatting
+    styler = styler.set_properties(**{
+        'text-align': 'left',
+        'border-right': '1px solid #d3d3d3',
+        'border-left': '1px solid #d3d3d3'
+    })
+
+    # Right-align numeric columns
+    styler = styler.set_properties(
+        subset=['Value', 'Baseline'], 
+        **{'text-align': 'right', 'padding-right': '10px'}
+    )
+
+    # 7 & 8. Header Styling (Consolidated)
+    styler = styler.set_table_styles([
+        {'selector': 'th', 'props': [
+            ('background-color', '#f2f2f2'), 
+            ('color', 'black'), 
+            ('font-weight', 'bold'),
+            ('border', '1px solid #666'),
+            ('text-align', 'center')
+        ]}
+    ], overwrite=False)
+
+    # 9. SECTION DIVIDERS
+    for i in range(len(plot_df)):
+        if i == 0 or plot_df.loc[i, 'Section'] != plot_df.loc[i-1, 'Section']:
+            styler = styler.set_table_styles({
+                i: [{'selector': 'td', 'props': [('border-top', '3px solid #444')]}]
+            }, overwrite=False, axis=1)
+        else:
+            styler = styler.set_table_styles({
+                i: [{'selector': 'td', 'props': [('border-top', '1px solid #eee')]}]
+            }, overwrite=False, axis=1)
+
+    display(styler)

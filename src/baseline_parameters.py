@@ -6,7 +6,7 @@ Parameter configuration for eVTOL conceptual design model.
 # =============================================================================
 # INITIAL VALUES
 # =============================================================================
-MTOM_initial = 1000  # maximum take-off mass [kg]
+MTOM_initial = 5000  # maximum take-off mass [kg]
 
 # =============================================================================
 # OPERATIONS PARAMETERS
@@ -64,8 +64,8 @@ n_blade_vert = 2        # Number of blades per hover propeller [-]
 l_fus_m = 6             # Fuselage length [m]
 r_fus_m = 0.75          # Fuselage radius [m] (→ diameter = 1.5 m)
 # rho_bat = 400          # Battery energy density [Wh/kg]
-m_pay = 392.8           # Payload mass (4 pax + luggage, 392.8kg based on EASA) [kg]
-m_crew = 96.5      # Crew mass (pilot + equipment) [kg] (96.5kg based on EASA)
+m_pay = 392.8           # Payload mass (4 pax + luggage) [kg]
+m_crew = 82.5 + 14      # Crew mass (pilot + equipment) [kg]
 d_rotors_space = 0.00125  # Minimum horizontal distance between hover rotors [m]
 
 # =============================================================================
