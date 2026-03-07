@@ -222,7 +222,7 @@ If you use this framework, these models, or methods in your research, please cit
 
 ---
 
-# 8. Further Reading & References
+# Further Reading & References
 
 If you want to dive deeper into the theory of **Multidisciplinary Design Optimization (MDO)** and **Urban Air Mobility (UAM)**, the following resources may be helpful:
 
@@ -243,5 +243,5 @@ If you want to dive deeper into the theory of **Multidisciplinary Design Optimiz
 
 ---
 
-## 7. License
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
