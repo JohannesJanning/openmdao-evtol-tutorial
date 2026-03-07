@@ -218,3 +218,30 @@ If you use this framework, these models, or methods in your research, please cit
   url = {[http://github.com/jax-ml/jax](http://github.com/jax-ml/jax)},
   year = {2018}
 }
+
+
+---
+
+# 8. Further Reading & References
+
+If you want to dive deeper into the theory of **Multidisciplinary Design Optimization (MDO)** and **Urban Air Mobility (UAM)**, the following resources may be helpful:
+
+- **Martins, J. R. R. A., & Lambe, A. B. (2013)**  
+  *Multidisciplinary Design Optimization: A Survey of Architectures*  
+  A foundational paper explaining how complex engineering systems and MDO architectures (such as XDSM) are structured.  
+  https://arc.aiaa.org/doi/10.2514/1.J051895
+
+- **Martins, J. R. R. A., & Ning, A. (2021)**  
+  *Engineering Design Optimization*  
+  A comprehensive graduate-level textbook covering optimization algorithms, derivative computation, and multidisciplinary design optimization methods used in modern engineering.  
+  https://www.cambridge.org/core/product/identifier/9781108980647/type/book
+
+- **Sengupta, R., Bulusu, V., et al. (2025)**  
+  *Urban Air Mobility Research: Challenges and Opportunities*  
+  A modern review of operational, technological, and autonomy challenges shaping the future of the eVTOL and UAM ecosystem.  
+  https://www.annualreviews.org/content/journals/10.1146/annurev-control-022823-031353
+
+---
+
+## 7. License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
