@@ -1,43 +1,209 @@
 # eVTOL Multidisciplinary Design Optimization (MDO) Tutorial
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/JohannesJanning/openmdao-evtol-tutorial/main?urlpath=lab/tree/README.md)
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org)
 
-This repository provides an interactive tutorial for the conceptual design and optimization of Electric Vertical Take-off and Landing (eVTOL) aircraft. It allows students and researchers to explore the trade-offs between environmental sustainability and economic viability in future urban air mobility.
+This repository provides an interactive tutorial for the conceptual design and optimization of an lift+cruise Electric Vertical Take-off and Landing (eVTOL) aircraft. It allows to explore the trade-offs between environmental sustainability and economic viability in future urban air mobility.
 
-## 1. Research Context
+---
+
+# 1. Research Context
+
 The models and optimization logic provided here are based on the multidisciplinary design optimization framework introduced in the following paper:
 
 > **Janning, J., Armanini, S. F., & Fasel, U. (2025).** [Future pathways for eVTOLs: A design optimization perspective](https://doi.org/10.48550/arXiv.2412.18078). *arXiv:2412.18078 [eess.SY]*.
 
-The framework integrates conventional aircraft design elements with comprehensive operational cost models to capture stakeholder-centric objectives, such as profit modeling, cost-efficiency, and sustainability strategies.
+The framework integrates conventional aircraft design elements with operational cost models to capture stakeholder-centric objectives, such as profit modeling, cost-efficiency, and sustainability strategies.
 
-## 2. Technical Framework
-The project utilizes a high-performance computational stack to solve complex engineering trade-offs:
+<p align="center">
+<img src="repo_images/XDSM_evtol_model.png" width="800">
+</p>
 
-* **[OpenMDAO](https://github.com/OpenMDAO/OpenMDAO):** An open-source framework for multidisciplinary analysis and optimization. It manages the coupling between aerodynamics, mass estimation, energy requirements, and cost models.
-* **[JAX](https://github.com/jax-ml/jax):** A library for composable transformations of Python and NumPy programs. It enables efficient gradient-based optimization through automatic differentiation, which is critical for the high-dimensional design spaces in eVTOL modeling.
+**Caption:** eXtended Design Structure Matrix of the provided design optimization problem. Figure includes single objectives of min. annual GWP (kg CO2e) and min. total operating cost (TOC) (€) per flight as example, that can be adjusted (see tutorial in Section 5).
 
-## 3. Getting Started
-### Accessing the Workspace
-Click the **Binder** badge at the top of this page to launch a cloud-resident JupyterLab session. All necessary dependencies are pre-installed in the container environment.
+---
 
-### Optimization Workflows
-The tutorial consists of two primary study cases:
-1.  **`01_optimize_GWP.ipynb`**: Focuses on minimizing the Global Warming Potential (GWP) of the aircraft mission.
-2.  **`02_optimize_TOC.ipynb`**: Focuses on minimizing the Total Operating Cost (TOC) to evaluate economic incentives.
+# 2. Technical Framework
 
-To execute a study, open a notebook and select **Cell > Run All** from the top menu.
+The project utilizes the following computational stack:
 
-## 4. Repository Structure
-* **`01_optimize_GWP.ipynb` & `02_optimize_TOC.ipynb`**: Primary interactive tutorial notebooks.
-* **`run_openmdao_opt_gwp.py` & `run_openmdao_opt_toc.py`**: Raw optimization scripts for reference.
-* **`src/`**: The core source code directory.
-    * **`models_jax/`**: Physics and cost components implemented in JAX.
-    * **`analysis/`**: Post-optimization processing and evaluation scripts.
-    * **`parameters.py`**: Central configuration for aircraft constants and mission assumptions.
-* **`src/results/`**: Directory where generated Excel reports and N2 model visualizations are stored.
+- **[OpenMDAO](https://github.com/OpenMDAO/OpenMDAO)**  
+  An open-source framework for multidisciplinary analysis and optimization. It manages the coupling between multiple analysis blocks, like aerodynamics, mass estimation, energy requirements, and cost models.
 
-## 5. Academic Citations
+- **[JAX](https://github.com/jax-ml/jax)**  
+  A library for composable transformations of Python and NumPy programs. It enables efficient gradient-based optimization through automatic differentiation.
+
+---
+
+# 3. Getting Started
+
+## Accessing the Workspace
+
+Click the Binder badge at the top of this page to launch a cloud-resident JupyterLab session. All necessary dependencies are pre-installed in the container environment.
+
+## Optimization Workflows
+
+The tutorial consists of one primary notebook:
+
+**01_optimize_GWP.ipynb**
+
+The notebook **02_optimize_TOC.ipynb** is identical and can be used as secondary comparison notebook.
+
+To execute a study, open a notebook and select:
+
+```
+Cell > Run All
+```
+
+from the top menu.
+
+---
+
+# 4. Repository Structure
+
+- **01_optimize_GWP.ipynb & 02_optimize_TOC.ipynb**  
+  Primary interactive tutorial notebooks (but as the objective function is adjustable, we can use either one for the Tutorial in section 5).
+
+- **src/**  
+  The core source code directory.
+
+  - **models_jax/**  
+    Physics and cost components implemented in JAX.
+
+  - **analysis/**  
+    Post-optimization processing and evaluation scripts.
+
+  - **Components/**  
+    components deifning the OpenMDAO model.
+
+  - **parameters.py**  
+    Central configuration for aircraft constants and mission assumptions.
+
+- **src/results/**  
+  Directory where generated Excel reports are stored.
+
+---
+
+# 5. Interactive Optimization Tutorials
+
+Follow these tasks to explore the multidisciplinary coupling of the eVTOL framework.
+
+## Notes
+
+You may find helpful:
+
+**GWP_annual_ops Optimal design vector**
+
+```
+[15.0, 1.7179846040279754, 1.5684475976845111, 1.5667718019064831, 400.0, 1.0]
+```
+
+**TOC_flight Optimal design vector**
+
+```
+[9.874446571073564, 1.0, 0.8561370588805344, 1.394907761845594, 399.99999999999994, 2.0253538731700154]
+```
+
+---
+
+# Task 1: Design Trade-offs
+
+Goal: Understand how the definition of an objective function dictates the physical architecture.
+
+## 1.1 Comparing Objectives
+
+1. Ensure the notebook is in its initial state.
+2. Cell 2.3: Set objective to minimize **GWP_flight** (ref: 20).
+3. Run the optimization.
+4. Cell 5: Copy the resulting **Optimal Design Vector** from Cell 4 into the **baseline_vector** variable.
+5. Cell 2.3: Change objective to minimize **TOC_flight** (ref: 100).
+6. Run the optimization and compare results in the Dashboard.
+
+Notice: observe how this two design variables sets introduce tradeoffs in environmental impact and operational costs.
+
+---
+
+## 1.2 Environmental Optimization
+
+7. Ensure the notebook is in its initial state.
+8. Cell 2.3: Set objective to minimize **GWP_flight** (ref: w0).
+9. Run the optimization.
+10. Cell 5: Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector** variable.
+11. Cell 2.3: Change objective to minimize **GWP_annual_ops** (ref: 50000).
+12. Run the optimization and compare results in the Dashboard.
+
+Observation: Notice how optimizing for a single flight vs. a whole year shifts the design.
+
+---
+
+## 1.3 Economic Optimization
+
+1. Reset to initial settings.
+2. Cell 2.3: Set objective to minimize **TOC_flight** (ref: 100).
+3. Run the optimization.
+4. Cell 5: Copy the Optimal Design Vector into **baseline_vector**.
+5. Cell 2.3: Set objective to maximize **Annual_Profit**.
+
+Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO's minimization-based solver).
+
+6. Run and compare.
+
+Observation: Identify the utilization trade-off. Does a more profitable plane fly differently than a cheaper-to-operate one?
+
+---
+
+# Task 2: Shifting the bounds
+
+Goal: Observe how design variable limitations impact the design space.
+
+1. Run a baseline **TOC_flight** optimization.
+2. Cell 5: Copy the vector into **baseline_vector**.
+3. Cell 2.1 (Design Variables): Change the upper bound of the battery energy density (**rho_bat**) from **400** to **300**.
+4. Run the optimization.
+
+Observation: How does our battery mass changes, how are our operating costs impacted?
+
+---
+
+# Task 3: Hitting constraints
+
+Goal: Experience the mathematical struggle of highly-constrained design. (use 01_optimize_GWP.ipynb)
+
+1. Run a baseline **GWP_annual** optimization and save the result to **baseline_vector**.
+2. Cell 2.2 (Constraints): Change the maximum **MTOM constraint** from **5700 (EASA SC-VTOL limit)** to **1500**.
+3. Run the optimization.
+
+Note: This may take up to **40 seconds**. The optimizer is navigating a much "narrower" feasible region.
+
+4. Analyze: Can the model still find a design? If yes, is the resulting design valid?
+
+---
+
+# Task 4: Manned vs. Autonomous Operations
+
+Goal: Quantify the secondary benefits of pilotless flight systems.
+
+1. Cell 2.3: Set **TOC_flight** as the objective and run a baseline optimization.
+2. Cell 5: Copy the design vector into **baseline_vector**.
+3. parameters.py: Open the file in the sidebar and modify:
+
+m_crew: Change **96.5** to **20.0** (simulates sensor suite replacing a cockpit)  
+N_ac: Change **1** to **3** (simulates 1 ground-pilot supervising 3 aircraft)
+
+4. Run the optimization.
+
+Observation: Compare the **Mass** and **Cost** sections.
+
+5. Further Stress Test: In **parameters.py**, increase **m_pay (payload)** from **392.8** to **600**. Run again and check the impact on mass and cost structure.
+
+---
+
+⚠️ Solver Note:  
+If an optimization takes more than **60 seconds** or fails to converge, you may have created a "physically impossible" aircraft (e.g., too much weight for too little battery). Try loosening your constraints or increasing your design variable bounds.
+
+---
+
+# 6. Academic Citations
+
 If you utilize this framework or these models in your research, please cite the following:
 
 ```bibtex
@@ -64,3 +230,4 @@ If you utilize this framework or these models in your research, please cite the 
   url = {[http://github.com/jax-ml/jax](http://github.com/jax-ml/jax)},
   year = {2018}
 }
+```

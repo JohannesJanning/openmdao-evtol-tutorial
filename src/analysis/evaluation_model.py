@@ -6,7 +6,8 @@ from datetime import datetime
 ####
 # LIBRARIES
 ####
-import src.parameters as p
+import src.parameters as p           # The "Target" or "Future" assumptions
+import src.baseline_parameters as pb  # The "Reference" or "Current" assumptions
 from src.models.aerodynamics import AR_calculation, drag_calculation, lift_calculation, ld_calculation, roc_calculation, cl_calculation, cd_calculation
 from src.models.battery import c_rate, c_rate_average, depth_of_discharge, battery_energy_capacity, number_of_battery_required_annually, battery_cycle_life
 from src.models.mass import interior_mass, gear_mass, fuselage_mass, battery_mass, motor_mass, wing_mass, rotor_mass, rotor_mass_per_unit, system_mass, empty_mass, compute_mtom_actual, mtom_iteration_loop, mass_fraction
@@ -570,7 +571,7 @@ def display_model_dashboard(results_dict, baseline=None):
                     try:
                         from src.analysis.evaluation_model import full_model_evaluation
                         baseline_results, _ = full_model_evaluation(
-                            baseline[0], baseline[1], baseline[2], baseline[3], baseline[4], baseline[5], p
+                            baseline[0], baseline[1], baseline[2], baseline[3], baseline[4], baseline[5], pb
                         )
                         for sec, metrics in baseline_results.items():
                             for label, (val, unit) in metrics.items():

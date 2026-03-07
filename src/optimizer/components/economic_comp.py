@@ -3,6 +3,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
+# Existing cost imports
 from src.models_jax.economic.costs import (
     energy_cost_model,
     navigation_cost_model,
@@ -17,22 +18,26 @@ from src.models_jax.economic.costs import (
     total_operating_cost,
 )
 
+# --- ADD THESE REVENUE IMPORTS ---
+# Adjust the path 'src.models_jax.economic.revenue' to wherever 
+# you saved those new functions
+from src.models_jax.economic.revenue import (
+    revenue_per_flight,
+    ticket_price_per_passenger,
+    profit_per_flight,
+    annual_profit
+)
+
 from src.models_jax.battery.E_battery_design import battery_energy_capacity
 from src.models_jax.operations.ops_model import turnaround_time, time_efficiency_ratio, daily_flight_cycles
 
 
 class EconomicComp(om.ExplicitComponent):
-    """Compute operating cost metrics and expose `TOC_flight` for optimization.
-
-    Inputs expected to be promoted at the group level: E_trip, MTOM, t_trip,
-    m_battery, rho_bat, FC_a, DOD, n_batt_annual, m_empty, c_charge.
-    """
-
     def initialize(self):
         self.options.declare('parameters')
 
     def setup(self):
-        # runtime inputs from other components
+        # Existing runtime inputs (Keep these as they are)
         self.add_input('E_trip', val=0.0)
         self.add_input('MTOM', val=1500.0)
         self.add_input('t_trip', val=3600.0)
@@ -44,18 +49,24 @@ class EconomicComp(om.ExplicitComponent):
         self.add_input('m_empty', val=0.0)
         self.add_input('c_charge', val=1.0)
 
-        # primary outputs used for objective
+        # Cost Outputs
         self.add_output('COC_flight', val=0.0)
         self.add_output('COO_value_flight', val=0.0)
         self.add_output('DOC_flight', val=0.0)
         self.add_output('IOC_value_flight', val=0.0)
         self.add_output('TOC_flight', val=0.0)
 
+        # --- NEW REVENUE & PROFIT OUTPUTS ---
+        self.add_output('Revenue_flight', val=0.0)
+        self.add_output('Ticket_price', val=0.0)
+        self.add_output('Profit_flight', val=0.0)
+        self.add_output('Annual_Profit', val=0.0)
+
         self.declare_partials('*', '*')
 
     def compute(self, inputs, outputs):
         p = self.options['parameters']
-
+        
         E_trip = inputs['E_trip'][0]
         MTOM = inputs['MTOM'][0]
         t_trip = inputs['t_trip'][0]
@@ -108,10 +119,34 @@ class EconomicComp(om.ExplicitComponent):
         outputs['DOC_flight'] = DOC_flight
         outputs['IOC_value_flight'] = IOC_value
         outputs['TOC_flight'] = TOC_flight
+        
+        # 1. Compute Revenue (using parameters)
+        rev_f = float(np.asarray(revenue_per_flight(p.fare_km, p.distance_trip_km, p.N_s, p.LF)))
+        
+        # 2. Compute Profit and Ticket Price
+        ticket = float(np.asarray(ticket_price_per_passenger(rev_f, p.N_s, p.LF)))
+        profit = float(np.asarray(profit_per_flight(rev_f, TOC_flight)))
+        # Note: we use inputs['FC_a'] because it's a dynamic input
+        ann_profit = float(np.asarray(annual_profit(rev_f, TOC_flight, inputs['FC_a'][0])))
+
+        # Assign existing outputs
+        outputs['COC_flight'] = COC_flight
+        outputs['COO_value_flight'] = COO_value
+        outputs['DOC_flight'] = DOC_flight
+        outputs['IOC_value_flight'] = IOC_value
+        outputs['TOC_flight'] = TOC_flight
+
+        # --- ASSIGN NEW OUTPUTS ---
+        outputs['Revenue_flight'] = rev_f
+        outputs['Ticket_price'] = ticket
+        outputs['Profit_flight'] = profit
+        outputs['Annual_Profit'] = ann_profit
 
     def compute_partials(self, inputs, partials):
         in_names = ['E_trip', 'MTOM', 't_trip', 'm_battery', 'rho_bat', 'FC_a', 'DOD', 'n_batt_annual', 'm_empty', 'c_charge']
-        out_names = ['COC_flight', 'COO_value_flight', 'DOC_flight', 'IOC_value_flight', 'TOC_flight']
+        # --- UPDATE OUT_NAMES TO INCLUDE NEW METRICS ---
+        out_names = ['COC_flight', 'COO_value_flight', 'DOC_flight', 'IOC_value_flight', 
+                     'TOC_flight', 'Revenue_flight', 'Ticket_price', 'Profit_flight', 'Annual_Profit']
 
         x = jnp.array([inputs[n][0] for n in in_names])
 
@@ -134,7 +169,16 @@ class EconomicComp(om.ExplicitComponent):
             FC_d = daily_flight_cycles(p.T_D, t_trip, DH)
             IOC_value = indirect_operating_cost(COC_flight, omega_empty, MTOM, p.P_s_empty, p.N_wd, FC_d)
             TOC_flight = total_operating_cost(DOC_flight, IOC_value)
-            return jnp.array([COC_flight, COO_value, DOC_flight, IOC_value, TOC_flight])
+            
+            # --- ADD REVENUE JAX LOGIC ---
+            # Using jnp-ready functions for gradients
+            rev_f = revenue_per_flight(p.fare_km, p.distance_trip_km, p.N_s, p.LF)
+            ticket = ticket_price_per_passenger(rev_f, p.N_s, p.LF)
+            profit = profit_per_flight(rev_f, TOC_flight)
+            ann_p = annual_profit(rev_f, TOC_flight, FC_a)
+            
+            return jnp.array([COC_flight, COO_value, DOC_flight, IOC_value, 
+                              TOC_flight, rev_f, ticket, profit, ann_p])
 
         J = jax.jacfwd(fun)(x)
         J = np.asarray(J)
