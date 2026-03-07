@@ -218,7 +218,7 @@ If you use this framework, these models, or methods in your research, please cit
   url = {[http://github.com/jax-ml/jax](http://github.com/jax-ml/jax)},
   year = {2018}
 }
-
+```
 
 ---
 
