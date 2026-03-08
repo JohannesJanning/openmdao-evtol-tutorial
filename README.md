@@ -77,7 +77,9 @@ Follow these tasks to explore the multidisciplinary coupling of the eVTOL framew
 
 ## Notes
 
-You may find helpful:
+⚠️ Note: If the Binder environment crashes, freezes, or does not execute any cells, go to *"Run"<"Restart Kernel and Run All Cells…"* to restart the session and execute the notebook from the beginning.
+
+You may find this helpful:
 
 **GWP_annual_ops Optimal design vector**
 
@@ -91,7 +93,6 @@ You may find helpful:
 [9.874446571073564, 1.0, 0.8561370588805344, 1.394907761845594, 399.99999999999994, 2.0253538731700154]
 ```
 
-⚠️ Note: If the Binder environment crashes, freezes, or does not execute any cells, go to *"Run"<"Restart Kernel and Run All Cells…"* to restart the session and execute the notebook from the beginning.
 ---
 
 # Task 1: Design Trade-offs
