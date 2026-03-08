@@ -91,6 +91,7 @@ You may find helpful:
 [9.874446571073564, 1.0, 0.8561370588805344, 1.394907761845594, 399.99999999999994, 2.0253538731700154]
 ```
 
+⚠️ Note: If the Binder environment crashes, freezes, or does not execute any cells, go to *"Run"<"Restart Kernel and Run All Cells…"* to restart the session and execute the notebook from the beginning.
 ---
 
 # Task 1: Design Trade-offs
@@ -99,12 +100,12 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 ## 1.1 Comparing Objectives
 
-1. Ensure the notebook is in its initial state.
+1. Start the notebook (**01_optimize_GWP.ipynb**). 
 2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
 3. Run the optimization.
-4. Cell 5: Copy the resulting **Optimal Design Vector** from Cell 4 into the **baseline_vector** variable.
+4. Copy the resulting **Optimal Design Vector** from cell 4 into the **baseline_vector** in cell 5.
 5. Cell 2.3: Change objective to minimize **TOC_flight** (set ref: 100).
-6. Run the optimization and compare results in the Dashboard.
+6. Run the optimization and compare results in the Dashboard (output of cell 5).
 
 *Observe how these two design variables sets introduce tradeoffs in environmental impact and operational costs.*
 
@@ -112,30 +113,30 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 ## 1.2 Environmental Optimization
 
-1. Ensure the notebook is in its initial state.
+1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
 2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
 3. Run the optimization.
-4. Cell 5: Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector**.
+4. Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector** in cell 5.
 5. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
-6. Run the optimization and compare results in the Dashboard.
+6. Run the optimization and compare results in the Dashboard (output of cell 5).
 
-*Notice how optimizing for a single flight vs. a whole year shifts the design.*
+*Notice how optimizing for an isloated event (single flight) vs. a a long-term operational timeline (a whole year) shifts the design and output.*
 
 ---
 
 ## 1.3 Economic Optimization
 
-1. Reset to initial settings.
+1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
 2. Cell 2.3: Set objective to minimize **TOC_flight** (set ref: 100).
 3. Run the optimization.
-4. Cell 5: Copy the Optimal Design Vector into the **baseline_vector**.
+4. Copy the Optimal Design Vector into the **baseline_vector** in cell 5.
 5. Cell 2.3: Set objective to maximize **Annual_Profit**.
 
 Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO's minimization-based solver).
 
-6. Run and compare.
+6. Run and compare (output of cell 5).
 
-*Identify the utilization trade-off. Does a more profitable plane fly differently than a cheaper-to-operate one?*
+*Identify the utilization trade-off: Notice how the optimizer prioritizes high-frequency operations across an annual timescale by sacrificing per-trip cost efficiency.*
 
 ---
 
@@ -143,10 +144,11 @@ Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO
 
 Goal: Observe how design variable limitations impact the design space.
 
-1. Run a baseline **TOC_flight** optimization (as described in task 1.1).
-2. Cell 5: Copy the vector into **baseline_vector**.
-3. Cell 2.1 (Design Variables): Change the upper bound of the battery energy density (**rho_bat**) from **400** to **300**.
-4. Run the optimization.
+1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+2. Run a baseline **TOC_flight** optimization (as described in task 1.1).
+3. Cell 5: Copy the vector into **baseline_vector**.
+4. Cell 2.1 (Design Variables): Change the upper bound of the battery energy density (**rho_bat**) from **400** to **300**.
+5. Run the optimization.
 
 *Observation: How does our battery mass change, how are our operating costs impacted?*
 
@@ -156,13 +158,15 @@ Goal: Observe how design variable limitations impact the design space.
 
 Goal: Experience the mathematical struggle of highly-constrained design.
 
-1. Run a baseline **GWP_annual** optimization and save the result to **baseline_vector** (as described in task 1.1).
-2. Cell 2.2 (Constraints): Change the maximum **MTOM constraint** from **5700 (EASA SC-VTOL limit)** to **1500**.
-3. Run the optimization.
+1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+2. If you have previously executed **task 2**, reset the **upper bound of “rho_bat”** to **400** in cell 2.1.
+3. Run a baseline **GWP_annual_ops** optimization and save the result to **baseline_vector** (as described in task 1.2).
+4. Cell 2.2 (Constraints): Change the maximum **MTOM constraint** from **5700 (EASA SC-VTOL limit)** to **1500**.
+5. Run the optimization.
 
-Note: This may take up to **40 seconds**. The optimizer is navigating a much "narrower" feasible region.
+Note: This may take up to **90 seconds**. The optimizer is navigating a much "narrower" feasible region.
 
-4. Analyze: Can the model still find a design? If yes, is the resulting design valid?
+*Observation: Does the optimizer still find a design under the new constraint? Is the resulting design feasible, or do any constraints remain violated? Compare the resulting MTOM and component masses with the baseline design. Which variables appear to have changed the most to satisfy the stricter MTOM limit?*
 
 ---
 
@@ -170,23 +174,26 @@ Note: This may take up to **40 seconds**. The optimizer is navigating a much "na
 
 Goal: Quantify the secondary benefits of pilotless flight systems.
 
-1. Cell 2.3: Set **TOC_flight** as the objective and run a baseline optimization.
-2. Cell 5: Copy the design vector into **baseline_vector**.
-3. parameters.py: Open the file in the sidebar and modify:
+1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+2. If you have previously executed **task 2**, reset the **upper bound of “rho_bat”** to **400** in cell 2.1.
+3. If you have previously executed **task 3**, reset the **MTOM constraint** to **5700** in cell 2.2.
+4. Cell 2.3: Set **TOC_flight** as the objective and run a optimization (as described in task 1.1).
+5. Cell 5: Copy the design vector into **baseline_vector**.
+6. src/parameters.py: Open the file in the sidebar and modify:
 
 m_crew: Change **96.5** to **20.0** (simulates sensor suite replacing a cockpit).  
-N_ac: Change **1** to **3** (simulates 1 ground-pilot supervising 3 aircraft).
+N_AC: Change **1** to **3** (simulates 1 ground-pilot supervising 3 aircraft).
 
-4. Run the optimization.
+7. Run the optimization (you would need to restart the kernel, as old parameter values may still be cached). 
 
-Observation: Compare the **Mass** and **Cost** sections.
+*Observation: Compare the **Mass** and **Cost** sections. How have the optimal design variables changed?*
 
-5. Further Stress Test: In **parameters.py**, increase **m_pay (payload)** from **392.8** to **600**. Run again and check the impact on mass and cost structure.
+8. Further Stress Test: In **parameters.py**, increase **m_pay (payload)** from **392.8** to **600**. Run again and check the impact on mass and cost structure.
 
 ---
 
 ⚠️ Solver Note:  
-If an optimization takes more than **60 seconds** or fails to converge, you may have created a "physically impossible" aircraft (e.g., too much weight for too little battery). Try loosening your constraints or increasing your design variable bounds.
+If an optimization takes more than **90 seconds** or fails to converge, you may have created a "physically impossible" aircraft (e.g., too much weight for too little battery). Try loosening your constraints or increasing your design variable bounds.
 
 ---
 
