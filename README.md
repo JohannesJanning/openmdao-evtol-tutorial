@@ -77,7 +77,7 @@ Follow these tasks to explore the multidisciplinary coupling of the eVTOL framew
 
 ## Notes
 
-⚠️ Note: If the Binder environment crashes, freezes, or does not execute any cells, go to *"Run"<"Restart Kernel and Run All Cells…"* to restart the session and execute the notebook from the beginning.
+⚠️ If the Binder environment crashes, freezes, or does not execute any cells, go to *"Run"<"Restart Kernel and Run All Cells…"* to restart the session and execute the notebook from the beginning.
 
 You may find this helpful:
 
