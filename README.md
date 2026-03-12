@@ -81,10 +81,10 @@ Follow these tasks to explore the multidisciplinary coupling of the eVTOL framew
 
 You may find this helpful:
 
-**GWP_annual_ops Optimal design vector**
+**GWP_flight Optimal design vector**
 
 ```
-[15.0, 1.7179846040279754, 1.5684475976845111, 1.5667718019064831, 400.0, 1.0]
+[14.999999999999998, 1.0, 1.3539263009458526, 1.6803959009972345, 400.0, 1.0000000000000007]
 ```
 
 **TOC_flight Optimal design vector**
@@ -115,11 +115,9 @@ Goal: Understand how the selection of an objective function dictates the physica
 ## 1.2 Environmental Optimization
 
 1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
-2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
-3. Run the optimization.
-4. Copy the resulting Optimal Design Vector from Cell 4 into the **baseline_vector** in cell 5.
-5. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
-6. Run the optimization and compare results in the Dashboard (output of cell 5).
+2. Set the optimal design vector for minimize **GWP_flight** into the **baseline_vector** in cell 5.
+3. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
+4. Run the optimization and compare results in the Dashboard (output of cell 5).
 
 *Notice how optimizing for an isloated event (single flight) vs. a a long-term operational timeline (a whole year) shifts the design and output.*
 
@@ -138,6 +136,17 @@ Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO
 6. Run and compare (output of cell 5).
 
 *Identify the utilization trade-off: Notice how the optimizer prioritizes high-frequency operations across an annual timescale by sacrificing per-trip cost efficiency.*
+
+---
+
+## 1.4 Multi-Objective Optimization
+
+1. From Task 1.3, keep the optimal design vector to maximize **Annual_Profit** in the **baseline_vector** in cell 5.
+2. In Cell 2.3: for the 'combined_obj' set **Annual_Profit** as first objective, with 'ref_1=-1e6' and 'w_1=0.5' and **GWP_flight** with 'ref_2=20' and 'w_2=0.5'. 
+3. In the 'add_objective'-term, set objective to 'obj', and 'ref=1'. 
+4. Run the multi-objective optimization. 
+
+*Notice how the optimal design adapts to combined annual profit-maximizing and per-flight environmental-aware design.*
 
 ---
 

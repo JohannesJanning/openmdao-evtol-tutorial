@@ -550,7 +550,7 @@ def write_results_to_excel(results_dict, comparison_list, mode="tests", filename
 
 
 
-def display_model_dashboard(results_dict, baseline=None):
+#def display_model_dashboard(results_dict, baseline=None):
     """
     Groups and displays all model results as a formatted table in Jupyter/Binder.
     """
@@ -651,6 +651,160 @@ def display_model_dashboard(results_dict, baseline=None):
     )
 
     # 7 & 8. Header Styling (Consolidated)
+    styler = styler.set_table_styles([
+        {'selector': 'th', 'props': [
+            ('background-color', '#f2f2f2'), 
+            ('color', 'black'), 
+            ('font-weight', 'bold'),
+            ('border', '1px solid #666'),
+            ('text-align', 'center')
+        ]}
+    ], overwrite=False)
+
+    # 9. SECTION DIVIDERS
+    for i in range(len(plot_df)):
+        if i == 0 or plot_df.loc[i, 'Section'] != plot_df.loc[i-1, 'Section']:
+            styler = styler.set_table_styles({
+                i: [{'selector': 'td', 'props': [('border-top', '3px solid #444')]}]
+            }, overwrite=False, axis=1)
+        else:
+            styler = styler.set_table_styles({
+                i: [{'selector': 'td', 'props': [('border-top', '1px solid #eee')]}]
+            }, overwrite=False, axis=1)
+
+    display(styler)
+
+
+
+def display_model_dashboard(results_dict, baseline=None):
+    """
+    Groups and displays all model results as a formatted table in Jupyter/Binder.
+    Includes a '% Change' column comparing Value to Baseline.
+    """
+    import pandas as pd
+    from IPython.display import display
+    import numpy as _np
+
+    # --- SET OPTIONS ---
+    pd.set_option('display.max_rows', 150)
+    pd.set_option('display.max_columns', 150)
+
+    # prepare optional baseline mapping
+    baseline_map = {}
+    if baseline is not None:
+        try:
+            if isinstance(baseline, (list, tuple)) or (hasattr(_np, "ndarray") and isinstance(baseline, _np.ndarray)):
+                if len(baseline) == 6:
+                    try:
+                        from src.analysis.evaluation_model import full_model_evaluation
+                        baseline_results, _ = full_model_evaluation(
+                            baseline[0], baseline[1], baseline[2], baseline[3], baseline[4], baseline[5], pb
+                        )
+                        for sec, metrics in baseline_results.items():
+                            for label, (val, unit) in metrics.items():
+                                baseline_map[label] = val
+                    except Exception:
+                        design_labels = ["Wing span", "Chord length", "Pusher rotor radius", "Hover rotor radius", "Battery energy density", "Charging C-rate"]
+                        baseline_map = {k: v for k, v in zip(design_labels, baseline)}
+            elif isinstance(baseline, dict):
+                baseline_map = baseline
+        except Exception:
+            baseline_map = {}
+
+    flat_data = []
+    for section, metrics in results_dict.items():
+        for label, (value, unit) in metrics.items():
+            bval = baseline_map.get(label, _np.nan)
+            
+            # --- Calculate % Change ---
+            pct_change = _np.nan
+            try:
+                v_num = float(value)
+                b_num = float(bval)
+                if b_num != 0:
+                    pct_change = ((v_num - b_num) / b_num) * 100
+            except (ValueError, TypeError):
+                pass
+
+            flat_data.append({
+                "Section": section,
+                "Metric": label,
+                "Value": value,
+                "Baseline": bval,
+                "Unit": unit,
+                "% Change": pct_change
+            })
+    
+    df = pd.DataFrame(flat_data)
+    
+    # 1. Set multi-index for grouping
+    styled_df = df.set_index(['Section', 'Metric'])
+    
+    # 2. Reorder columns (Value, Baseline, Unit, % Change)
+    cols = ['Value', 'Baseline', 'Unit', '% Change'] if 'Baseline' in df.columns else ['Value', 'Unit']
+    final_df = styled_df[cols]
+
+    # --- START OF STYLING LOGIC ---
+    plot_df = final_df.reset_index()
+    plot_df['Metric'] = plot_df['Metric'].replace('Chrod length', 'Chord length')
+    
+    # Convert to numeric for formatting
+    plot_df['Value'] = pd.to_numeric(plot_df['Value'], errors='coerce')
+    plot_df['Baseline'] = pd.to_numeric(plot_df['Baseline'], errors='coerce')
+    plot_df['% Change'] = pd.to_numeric(plot_df['% Change'], errors='coerce')
+
+    # 2. Create the Styler
+    styler = plot_df.style.hide(axis="index")
+
+    # 3. ROUNDING & FORMATTING
+    format_dict = {
+        'Value': '{:,.3f}', 
+        'Baseline': '{:,.3f}', 
+        '% Change': '{:+.2f}%'
+    }
+    styler = styler.format(format_dict, na_rep="-")
+
+    # 4. HIDE REPEATED SECTION LABELS
+    def hide_repeats(column):
+        is_duplicate = column.duplicated()
+        return ['color: transparent' if v else '' for v in is_duplicate]
+    styler = styler.apply(hide_repeats, subset=['Section'], axis=0)
+
+    # 5. Uniform Light Blue for 'Value' column
+    styler = styler.set_properties(subset=['Value'], **{'background-color': '#e6f3ff'})
+    
+    # --- 5.5 HIGHLIGHT SPECIFIC ROWS ---
+    highlight_metrics = ["Ops GWP total per year", "Total operating cost per trip"]
+    def highlight_rows(row):
+        if row['Metric'] in highlight_metrics:
+            return ['background-color: #ffeb3b; font-weight: bold'] * len(row)
+        return [''] * len(row)
+    styler = styler.apply(highlight_rows, axis=1)
+
+    # --- 5.6 COLOR % CHANGE COLUMN ---
+    def color_pct_logic(val):
+        if pd.isna(val): return ''
+        # Red for increase, green for decrease
+        color = 'red' if val > 0.01 else 'green' if val < -0.01 else 'black'
+        return f'color: {color}'
+    
+    # Using map() instead of applymap() to avoid AttributeError
+    styler = styler.map(color_pct_logic, subset=['% Change'])
+
+    # 6. Global formatting
+    styler = styler.set_properties(**{
+        'text-align': 'left',
+        'border-right': '1px solid #d3d3d3',
+        'border-left': '1px solid #d3d3d3'
+    })
+
+    # Right-align numeric columns
+    styler = styler.set_properties(
+        subset=['Value', 'Baseline', '% Change'], 
+        **{'text-align': 'right', 'padding-right': '10px'}
+    )
+
+    # 7 & 8. Header Styling
     styler = styler.set_table_styles([
         {'selector': 'th', 'props': [
             ('background-color', '#f2f2f2'), 
