@@ -38,11 +38,6 @@ The project utilizes the following computational stack:
 
 Click the Binder badge at the top of this page to launch a cloud-resident JupyterLab session. All necessary dependencies are pre-installed in the container environment.
 
-## Optimization Workflows
-
-The tutorial consists of one primary notebook: **01_optimize_GWP.ipynb**
-The notebook **02_optimize_TOC.ipynb** is identical and can be used as a secondary comparison notebook.
-To execute a study, open a notebook and select: "Run > Run All Cells" from the top menu.
 
 ---
 
@@ -71,6 +66,14 @@ To execute a study, open a notebook and select: "Run > Run All Cells" from the t
 
 - **src/results/**  
   Directory where generated Excel reports are stored.
+
+---
+
+## Optimization Workflows
+
+The tutorial consists of two primary notebook: **01_optimize_SOO.ipynb**, and **01_optimize_MOO.ipynb**
+The notebook 02/03_optimize_SOO.ipynb are identical and can be used as secondary comparison notebooks.
+To execute a study, open a notebook and select: "Run > Run All Cells" from the top menu.
 
 ---
 
