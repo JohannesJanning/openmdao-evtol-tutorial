@@ -48,8 +48,11 @@ To execute a study, open a notebook and select: "Run > Run All Cells" from the t
 
 # 4. Repository Structure
 
-- **01_optimize_GWP.ipynb & 02_optimize_TOC.ipynb**  
-  Primary interactive tutorial notebooks (as the objective function is adjustable, either notebook can be used for the tasks in Section 5).
+- **01_optimize_SOO.ipynb**  
+  Primary interactive tutorial notebooks for single-objective optimization (SOO). '02_optimize_SOO.ipynb' and '03_optimize_SOO.ipynb' are identical and can be used simulaneously. As the objective function is adjustable, either notebook can be used for the tasks in Section 5.
+
+- **01_optimize_MOO.ipynb**
+  Interative tutorial notebook for weighted multi-objective optimization (MOO), 
 
 - **src/**  
   The core source code directory.
@@ -101,7 +104,7 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 ## 1.1 Comparing Objectives
 
-1. Start the notebook (**01_optimize_GWP.ipynb**). 
+1. Start the notebook (**01_optimize_SOO.ipynb**). 
 2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
 3. Run the optimization.
 4. Copy the resulting **Optimal Design Vector** from cell 4 into the **baseline_vector** in cell 5.
@@ -114,7 +117,7 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 ## 1.2 Environmental Optimization
 
-1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+1. Optional: start the notebook (**01_optimize_SOO.ipynb**). 
 2. Set the optimal design vector for minimize **GWP_flight** into the **baseline_vector** in cell 5.
 3. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
 4. Run the optimization and compare results in the Dashboard (output of cell 5).
@@ -125,7 +128,7 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 ## 1.3 Economic Optimization
 
-1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+1. Optional: start the notebook (**01_optimize_SOO.ipynb**). 
 2. Cell 2.3: Set objective to minimize **TOC_flight** (set ref: 100).
 3. Run the optimization.
 4. Copy the Optimal Design Vector into the **baseline_vector** in cell 5.
@@ -141,10 +144,11 @@ Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO
 
 ## 1.4 Multi-Objective Optimization
 
-1. From Task 1.3, keep the optimal design vector to maximize **Annual_Profit** in the **baseline_vector** in cell 5.
-2. In Cell 2.3: for the 'combined_obj' set **Annual_Profit** as first objective, with 'ref_1=-1e6' and 'w_1=0.5' and **GWP_flight** with 'ref_2=20' and 'w_2=0.5'. 
-3. In the 'add_objective'-term, set objective to 'obj', and 'ref=1'. 
-4. Run the multi-objective optimization. 
+1. Start with the notebook (**01_optimize_MOO.ipynb**). 
+2. From Task 1.3, keep the optimal design vector to maximize **Annual_Profit** in the **baseline_vector** in cell 5.
+3. In Cell 2.3: for the 'combined_obj' set **Annual_Profit** as first objective, with 'ref_1=-1e6' and 'w_1=0.5' and **GWP_flight** with 'ref_2=20' and 'w_2=0.5'. 
+4. In the 'add_objective'-term, set objective to 'obj', and 'ref=1'. 
+5. Run the multi-objective optimization. 
 
 *Notice how the optimal design adapts to combined annual profit-maximizing and per-flight environmental-aware design.*
 
@@ -154,7 +158,7 @@ Note: Use **ref = -1000000** (The negative sign enables maximization in OpenMDAO
 
 Goal: Observe how design variable limitations impact the design space.
 
-1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+1. Optional: start the notebook (**01_optimize_SOO.ipynb**). 
 2. Run a baseline **TOC_flight** optimization (as described in task 1.1).
 3. Cell 5: Copy the vector into **baseline_vector**.
 4. Cell 2.1 (Design Variables): Change the upper bound of the battery energy density (**rho_bat**) from **400** to **300**.
@@ -168,9 +172,9 @@ Goal: Observe how design variable limitations impact the design space.
 
 Goal: Experience the mathematical struggle of highly-constrained design.
 
-1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+1. Optional: start the notebook (**01_optimize_SOO.ipynb**). 
 2. If you have previously executed **task 2**, reset the **upper bound of “rho_bat”** to **400** in cell 2.1.
-3. Run a baseline **GWP_annual_ops** optimization and save the result to **baseline_vector** (as described in task 1.2).
+3. Run a baseline **TOC_flight** optimization and save the result to **baseline_vector** (as described in task 1.2).
 4. Cell 2.2 (Constraints): Change the maximum **MTOM constraint** from **5700 (EASA SC-VTOL limit)** to **1500**.
 5. Run the optimization.
 
@@ -184,7 +188,7 @@ Note: This may take up to **90 seconds**. The optimizer is navigating a much "na
 
 Goal: Quantify the secondary benefits of pilotless flight systems.
 
-1. Optional: start the notebook (**01_optimize_GWP.ipynb**). 
+1. Optional: start the notebook (**01_optimize_SOO.ipynb**). 
 2. If you have previously executed **task 2**, reset the **upper bound of “rho_bat”** to **400** in cell 2.1.
 3. If you have previously executed **task 3**, reset the **MTOM constraint** to **5700** in cell 2.2.
 4. Cell 2.3: Set **TOC_flight** as the objective and run a optimization (as described in task 1.1).

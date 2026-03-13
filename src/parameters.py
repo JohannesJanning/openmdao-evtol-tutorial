@@ -6,7 +6,7 @@ Parameter configuration for eVTOL conceptual design model.
 # =============================================================================
 # INITIAL VALUES
 # =============================================================================
-MTOM_initial = 1000  # maximum take-off mass [kg]
+MTOM_initial = 2000  # maximum take-off mass [kg]
 
 # =============================================================================
 # OPERATIONS PARAMETERS
