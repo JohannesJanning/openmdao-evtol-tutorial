@@ -284,8 +284,7 @@ def full_model_evaluation(b, c, R_prop_cruise, R_prop_hover, rho_bat, c_charge, 
         "Crew mass": (round(p.m_crew, 3), "kg"),
         "Battery mass": (round(m_battery, 3), "kg"),
         "Empty mass": (round(m_empty, 3), "kg"),
-        "MTOM from model": (round(mtom_model_check, 3), "kg"),
-        "MTOM iterated": (round(MTOM, 3), "kg"),
+        "MTOM": (round(MTOM, 3), "kg"),
         "Battery mass fraction": (round(omega_battery, 3), "-"),
         "Empty mass fraction": (round(omega_empty, 3), "-"),
     }, 
@@ -928,7 +927,7 @@ def display_model_dashboard_moo(results_dict, baseline=None):
     styler = styler.set_properties(subset=['Value'], **{'background-color': '#e6f3ff'})
     
     # --- 5.5 HIGHLIGHT SPECIFIC ROWS ---
-    highlight_metrics = ["Ops GWP total per flight", "Total profit per year"]
+    highlight_metrics = ["Ops GWP total per flight", "Total operating cost per trip"]
     def highlight_rows(row):
         if row['Metric'] in highlight_metrics:
             return ['background-color: #ffeb3b; font-weight: bold'] * len(row)

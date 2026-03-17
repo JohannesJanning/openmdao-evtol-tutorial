@@ -55,14 +55,14 @@ Click the Binder badge at the top of this page to launch a cloud-resident Jupyte
   - **models_jax/**  
     Physics and cost components implemented in JAX.
 
-  - **analysis/**  
-    Post-optimization processing and evaluation scripts.
-
   - **Components/**  
-    components defining the OpenMDAO model.
+    Components defining the OpenMDAO model.
 
   - **parameters.py**  
     Central configuration for aircraft constants and mission assumptions.
+
+  - **analysis/**  
+    Post-optimization processing and evaluation scripts.
 
 - **src/results/**  
   Directory where generated Excel reports are stored.
