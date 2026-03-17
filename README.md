@@ -111,7 +111,7 @@ Goal: Understand how the selection of an objective function dictates the physica
 2. Cell 2.3: Set objective to minimize **TOC_flight** (scaling: set ref=100).
 3. Run the optimization.
 4. Copy the resulting **Optimal Design Vector** from cell 4 into the **baseline_vector** in cell 5.
-5. Cell 2.3: Change objective to minimize **GWP_flight** (sclaing: set ref=100).
+5. Cell 2.3: Change objective to minimize **GWP_flight** (sclaing: set ref=20).
 6. Run the optimization and compare results in the Dashboard (output of cell 5).
 
 *Observe how these two design variables sets introduce tradeoffs in environmental impact and operational costs.*
