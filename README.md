@@ -108,10 +108,10 @@ Goal: Understand how the selection of an objective function dictates the physica
 ## 1.1 Comparing Objectives
 
 1. Start the notebook (**01_optimize_SOO.ipynb**). 
-2. Cell 2.3: Set objective to minimize **GWP_flight** (set ref: 20).
+2. Cell 2.3: Set objective to minimize **TOC_flight** (scaling: set ref=100).
 3. Run the optimization.
 4. Copy the resulting **Optimal Design Vector** from cell 4 into the **baseline_vector** in cell 5.
-5. Cell 2.3: Change objective to minimize **TOC_flight** (set ref: 100).
+5. Cell 2.3: Change objective to minimize **GWP_flight** (sclaing: set ref=100).
 6. Run the optimization and compare results in the Dashboard (output of cell 5).
 
 *Observe how these two design variables sets introduce tradeoffs in environmental impact and operational costs.*
@@ -122,7 +122,7 @@ Goal: Understand how the selection of an objective function dictates the physica
 
 1. Optional: start the notebook (**01_optimize_SOO.ipynb**). 
 2. Set the optimal design vector for minimize **GWP_flight** into the **baseline_vector** in cell 5.
-3. Cell 2.3: Change objective to minimize **GWP_annual_ops** (set ref: 50000).
+3. Cell 2.3: Change objective to minimize **GWP_annual_ops** (scaling: set ref=50000).
 4. Run the optimization and compare results in the Dashboard (output of cell 5).
 
 *Notice how optimizing for an isloated event (single flight) vs. a a long-term operational timeline (a whole year) shifts the design and output.*
